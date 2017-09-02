@@ -18,16 +18,14 @@ typedef   struct   StopWords   {
 
 int main () {
     //leerArchivo("StopWords.txt");
-    Lista * lista1 = createList();
-    printf("post init: %d\n", lista1->tamano);
-    leerArchivo("doc1.txt",lista1);
-    printf("post leer: %d\n", lista1->tamano);
-    imprimirLista(lista1);
+    Lista * listaPalabras = createList();
+    printf("post init: %d\n", listaPalabras->tamano);
+    //leerArchivo("doc1.txt",listaPalabras);
+    lecturaArchivo("doc1.txt",listaPalabras);
 
-    //prueba
-    /*for (int i = 0; i < 10; i++) {
-        agregar(lista1,"hola",i);
-    }*/
+    printf("post leer: %d\n", listaPalabras->tamano);
+    imprimirLista(listaPalabras);
+
 
     return 0;
 }

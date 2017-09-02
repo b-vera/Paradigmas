@@ -29,6 +29,27 @@ void leerArchivo(char * nombreArchivo, Lista * list){
     if (line){
         free(line);
     }
-    // exit(1);
     return;
+}
+
+void lecturaArchivo(char* nombreArchivo, Lista * list){
+    FILE *archivo;
+
+ 	char caracteres[100];
+
+ 	archivo = fopen(nombreArchivo,"r");
+
+ 	if (archivo == NULL)
+ 		exit(1);
+
+ 	printf("\nEl contenido del archivo de prueba es \n\n");
+    int id = 1;
+ 	while (feof(archivo) == 0)
+ 	{
+ 		fgets(caracteres,100,archivo);
+        agregar(list,caracteres,id++);
+ 		//printf("%s\n",caracteres);
+ 	}
+        fclose(archivo);
+	return;
 }

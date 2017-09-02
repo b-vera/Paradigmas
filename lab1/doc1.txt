@@ -10,7 +10,7 @@ j. ae. scs. 25, 1958, 324.
 experimental investigation of the aerodynamics of a
 wing in a slipstream .
   an experimental study of a wing in a propeller slipstream was
-made in order to determine the spanwise distribution of the lift
+  made in order to determine the spanwise distribution of the lift
 increase due to slipstream at different angles of attack of the wing
 and at different free stream to slipstream velocity ratios .  the
 results were intended in part as an evaluation basis for different

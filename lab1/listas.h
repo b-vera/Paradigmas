@@ -17,6 +17,7 @@ typedef struct Lista{
     int tamano;
 }Lista;
 
+// crear una lista
 Lista * createList(){
     Lista * List = (Lista *)malloc(sizeof(Lista));
     List->head = NULL;
@@ -30,9 +31,6 @@ void agregar(Lista * list,char* data, int key){
 
     Nodo * link = (Nodo *)malloc(sizeof(Nodo));
     link->data = (char *)malloc(strlen(data)*sizeof(char));
-
-    //tamaño lista
-    //printf("tamano lista: %i\n",list->tamano);
 
     if (list->tamano == 0 ) {
         // printf("hola1\n");
@@ -54,11 +52,12 @@ void agregar(Lista * list,char* data, int key){
     }
 }
 
+// imprimir el contenido de la lista
 void imprimirLista(Lista * list){
-    printf("entre\n");
+    printf("entre a imprimir lista\n");
     Nodo *ptr = list->head;
     while(ptr->siguiente) {
-        printf("(%d,%s) \n",ptr->key,ptr->data);
+        printf("%d.- %s\n",ptr->key,ptr->data);
         ptr = ptr->siguiente;
     }
 
