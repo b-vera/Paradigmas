@@ -1,0 +1,12 @@
+papeo scheme
+
+#time
+(require racket/date)
+;(date-second (current-date))
+;(date-minute (current-date))
+;(date-hour (current-date))
+;(date-day (current-date))
+;(date-month (current-date))
+;(date-year (current-date))
+
+(string-split mensaje) #string a lista

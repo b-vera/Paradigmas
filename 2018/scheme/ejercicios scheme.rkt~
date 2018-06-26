@@ -1,0 +1,25 @@
+#lang racket
+(define (esMenor a b)
+  (if (> a b)
+      #f
+      #t
+      )
+  )
+
+(/ (+ 5 (+ 4 (- 2 (- 3 (+ 6 (/ 4 5)))))) (* (- 2 7) (* 3 (- 6 2))))
+
+(define (sumCuadrados a b c)
+  (cond
+    [(and (< a b) (< a c)) (+ (* c c) (* b b))]
+    [(and (< b a) (< b a)) (+ (* c c) (* a a))]
+    [(and (< c a) (< c b)) (+ (* a a) (* b b))]))
+
+(define (factorial n)
+  (cond
+    [(= n 1) 1 ]
+    [else (* (factorial (- n 1)) n)]
+  )
+  )
+
+(define (fibs n)
+  (if (or (= n 0) (= n 1)) 1 (+ (fibs(- n 1)) (fibs(- n 2)) )))

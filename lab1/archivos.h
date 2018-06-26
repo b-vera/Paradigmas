@@ -1,7 +1,6 @@
-#pragma once
-
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include "listas.h"
@@ -32,10 +31,27 @@ void leerArchivo(char * nombreArchivo, Lista * list){
     return;
 }
 
+char * LimpiarPalabra(char * palabra){
+    int i,j=0;
+    int largo = strlen(palabra);
+    char * nuevaPalabra =(char*)malloc(sizeof(char)*largo);
+    for (i = 0; i < largo; i++) {
+        if (isalpha(palabra[i])!=0 || isdigit(palabra[i])!=0 || palabra[i]== '-') {
+            nuevaPalabra[j] = palabra[i];
+            j++;
+        }
+    }
+    //printf("%s\n",nuevaPalabra);
+    return nuevaPalabra;
+}
+
 void lecturaArchivo(char* nombreArchivo, Lista * list){
     FILE *archivo;
 
  	char caracteres[100];
+    const char s[2] = " ";
+    char *token;
+    char *palabra;
 
  	archivo = fopen(nombreArchivo,"r");
 
@@ -44,12 +60,17 @@ void lecturaArchivo(char* nombreArchivo, Lista * list){
 
  	printf("\nEl contenido del archivo de prueba es \n\n");
     int id = 1;
+
  	while (feof(archivo) == 0)
  	{
  		fgets(caracteres,100,archivo);
-        agregar(list,caracteres,id++);
- 		//printf("%s\n",caracteres);
+        token = strtok(caracteres, s);
+        while( token != NULL ) {
+            palabra = LimpiarPalabra(token);
+            agregar(list,palabra,id++);
+            token = strtok(NULL, s);
+        }
  	}
-        fclose(archivo);
+    fclose(archivo);
 	return;
 }

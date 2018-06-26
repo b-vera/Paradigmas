@@ -5,17 +5,17 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-typedef struct Nodo{
+typedef struct Nodo {
     char* data;
     int key;
     struct Nodo * siguiente;
-}Nodo;
+} Nodo;
 
-typedef struct Lista{
+typedef struct Lista {
     Nodo * head;
     Nodo * tail;
     int tamano;
-}Lista;
+} Lista;
 
 // crear una lista
 Lista * createList(){
@@ -27,7 +27,7 @@ Lista * createList(){
 }
 
 // creado el nuevo nodo
-void agregar(Lista * list,char* data, int key){
+void agregar(Lista * list,char* data, int key) {
 
     Nodo * link = (Nodo *)malloc(sizeof(Nodo));
     link->data = (char *)malloc(strlen(data)*sizeof(char));
@@ -60,5 +60,19 @@ void imprimirLista(Lista * list){
         printf("%d.- %s\n",ptr->key,ptr->data);
         ptr = ptr->siguiente;
     }
+}
 
+int buscarPalabra(Lista * list, char * palabra) {
+    Nodo *ptr = list->head;
+    while(ptr != NULL) {
+        printf("ptr: %s palabra: %s\n",ptr->data,palabra);
+        printf("valor strcmp: %d\n",strcmp(ptr->data,palabra) );
+        if (strcmp(ptr->data,palabra)==0) {
+            printf("encontre una coincidencia\n");
+            return 1;
+        }else{
+            ptr = ptr-> siguiente;
+        }
+    }
+    return 0;
 }

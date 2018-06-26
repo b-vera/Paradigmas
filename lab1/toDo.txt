@@ -1,0 +1,2 @@
+-limpiar palabras
+-buscar palabra en lista

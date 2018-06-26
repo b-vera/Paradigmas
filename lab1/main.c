@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include "listas.h"
 #include "archivos.h"
+#include "StopWords.h"
+
+enum   code   {OK,   ERR_FILE_NOT_FOUND,   ERR_FILE_NOT_PERM};
 
 /*typedef   struct   Index   {
 }   Index;
@@ -11,21 +14,16 @@ typedef   struct   Result   {
 
 typedef   struct   Ranking   {
 }   Ranking;
-
-typedef   struct   StopWords   {
-}   StopWords;
 */
 
 int main () {
-    //leerArchivo("StopWords.txt");
     Lista * listaPalabras = createList();
-    printf("post init: %d\n", listaPalabras->tamano);
-    //leerArchivo("doc1.txt",listaPalabras);
+    Lista * listaStopWords = createList();
+    //printf("post init: %d\n", listaPalabras->tamano);
     lecturaArchivo("doc1.txt",listaPalabras);
-
-    printf("post leer: %d\n", listaPalabras->tamano);
+    lecturaArchivo("StopWords.txt",listaStopWords);
+    //printf("post leer: %d\n", listaPalabras->tamano);
     imprimirLista(listaPalabras);
-
 
     return 0;
 }

@@ -1,0 +1,347 @@
+#lang scheme
+; Importacion requerida para la implementacion de la fecha/hora
+(require racket/date)
+; Constantes
+(define a 1103515245)
+(define c 12345)
+(define m 2147483648)
+(define user1 (list "Maria" "me duele demasiado" "disculpe, me duele demasiado el estomago" "a veces me siento muy cansado" "y tambien siento calor en demasía" "no"))
+(define user2 (list "Rodrigo" "en las mañanas despierto cansado" "aveces en la noche tengo muchos mocos" "no"))
+(define user3 (list "Diego" "tengo demasiada calor en estos momentos" "a ratos me duele el estomago" "me siento cansado sin hacer nada" "no"))
+
+; ========== ESTRUCTURA chatbot ==========
+; define nuestra estructura chatbot en conjunto con todas sus caracteristicas necesarias para la implementacion
+(define-struct chatbot ( 
+                 mensajeBienvenida  ; listado de Mensajes de Bienvenida que presenta el chatbot
+                 mensajePregunta    ; listado de preguntas al usuario que presenta el chatbot
+                 mensajeFinal       ; listado de frases de despedida del chatbot
+                 mensajeLazy        ; mensaje entregado a la hora de realizar una evaluación Perezosa
+                 sintomas           ; listado de sintomas que puede presentar el paciente
+                 diagnosticos       ; listado de diagnosticos a entregar al paciente segun su sintoma
+                 id                 ; identificador de cada chatbot
+                 rateUser           ; puntuacion entregada por el usuario
+                 rate               ; puntuacion generada por un algoritmo
+                 )
+  )
+
+; creación de un chatbot nombrado "bot" con las respuestas integradas a este
+(define bot (make-chatbot '("Hola! Bienvenido a su asistente de salud virtual, ¿Me podrias decir tu nombre? "
+                            "Bienvenido! me llaman asistente de salud virtual y tu? ¿como te llamas? "
+                            "Estas hablando con su asistente de salud virtual ¿Cual es tu nombre?")
+                           '( "¿presenta usted alguna molestia o malestar?"
+                              "¿con que puedo ayudarle esta vez respecto a su salud? "
+                              "¿que problema ha sentido ultimamente?")
+                           '("Hasta luego, Cuidese y ante cualquier duda puede volver a consultar :)"
+                             "Gracias por consultar y espero que te mejores :), hasta pronto"
+                             "Hasta pronto! espero haber sido de gran ayuda :)!")
+                           '("No me acuerdo bien, en unos momentos te respondo")
+                           '("calor" "cansado" "mocos" "estomago" "no")
+                           '("es probable que tengas fiebre, te recomiendo usar paños frios para reducir la temperatura"
+                             "por lo que me cuentas puede que te falten vitaminas y minerales en tu cuerpo"
+                             "por lo que me cuentas puedo decir que te encuentras con un resfriado comun, por lo que necesitas descansar, hidratarte y un tapsin en la noche"
+                             "es probable que tengas gastroenteritis, asi que tendras que cuidar tu alimentacion"
+                             "Me alegra haber resuelto tus dudas :D")
+                           '(1)
+                           '(0)
+                           '(0)
+                           )
+  )
+
+; ========== TDA ==========
+; el tda implementado corresponde a datos, el cual representa un mensaje que se encuentra caracterizado por
+; el nombre de el usuario y a la vez el mensaje.
+
+;CONSTRUCTOR
+(define (datos usuario mensaje)
+  (if (and (string? usuario) (string? mensaje))
+      (string-append usuario " : " mensaje)
+      ""
+      )
+  )
+
+;FUNCION DE PERTENENCIA
+(define (datos? string)
+  (if (string? string)
+      (if (not (equal? string ""))
+          #t
+          #f
+          )
+      #f
+      )
+  )
+
+;SELECTORES
+(define (getUsuario string)
+    (if (datos? string)
+        (car (string-split string))
+        ""
+     )
+   )
+
+(define (getMensaje lista string)
+  (if (empty? lista)
+      string
+      (getMensaje (cdr lista) (string-append string " "(car lista)))
+      )
+  )
+
+;MODIFICADORES
+  (define (setDatosUsuario string usuario)
+    (if (datos? string)
+        (datos usuario (getMensaje string))
+        string
+     )
+   )
+
+(define (setDatosMensaje string mensaje)
+    (if (datos? string)
+        (datos (getUsuario string) mensaje)
+        string
+     )
+   )
+
+; ========== myRandom ==========
+; encargado de generar un numero a leatorio para la eleccion de las respuestas
+; Signature: entero -> entero
+(define myRandom
+  (lambda
+    (xn)
+    (remainder (+ (* a xn) c) m)
+  )
+)
+
+; ========== NumeroRand ==========
+; funcion que entrega el modulo de 3 de un valor
+; Signature: entero -> entero
+(define (numeroRand seed)
+  (remainder seed 3)
+  )
+
+; ========== elemRandomBienvenida ==========
+; funcion que entrega un resultado aleatorio dentro de las respuestas de bienvenida
+; Signature: entero -> string
+(define (elemRandomBienvenida seed)
+  (cond
+   [(= (numeroRand seed) 0) (car(chatbot-mensajeBienvenida bot))]
+   [(= (numeroRand seed) 1) (cadr(chatbot-mensajeBienvenida bot))]
+   [(= (numeroRand seed) 2) (cddr(chatbot-mensajeBienvenida bot))])
+  )
+
+; ========== elemRandomDespedida ==========
+; funcion que entrega un resultado aleatorio dentro de las respuestas de bienvenida
+; Signature: entero -> string
+(define (elemRandomDespedida seed)
+  (cond
+   [(= (numeroRand seed) 0) (car(chatbot-mensajeFinal bot))]
+   [(= (numeroRand seed) 1) (cadr(chatbot-mensajeFinal bot))]
+   [(= (numeroRand seed) 2) (cddr(chatbot-mensajeFinal bot))])
+  )
+
+; ========== elemRandomDespedida ==========
+; funcion que entrega un resultado aleatorio dentro de las respuestas de preguntas, incluyendo el nombre del usuario
+; Signature: entero X string -> string
+(define (elemRandomPregunta seed name)
+  (cond
+   [(= (numeroRand seed) 0) (string-append "perfecto, " name " " (car(chatbot-mensajePregunta bot)))]
+   [(= (numeroRand seed) 1) (string-append "hola " name " " (cadr(chatbot-mensajePregunta bot)))]
+   [(= (numeroRand seed) 2) (string-append "un gusto " name " " (cadr(chatbot-mensajePregunta bot)))])
+  )
+
+; ========== beginDIalog ==========
+; funcion encargada de la iniciacion del chatbot retornando un log con un mensaje de bienvenida
+; Signature: estructura X lista X entero -> lista de Strings
+(define (beginDialog chatbot log seed)
+  (if (list? log)
+      (append (chatbot-id bot) log (list (string-append (number->string(date-day (current-date))) "-"
+                                                            (number->string(date-month (current-date))) "-"
+                                                            (number->string(date-year (current-date))) " "
+                                                            (number->string(date-hour (current-date))) ":"
+                                                            (number->string(date-minute (current-date))) ":"
+                                                            (number->string(date-second (current-date))) " -> "
+                                                            (datos "chatbot" (elemRandomBienvenida seed))
+                                                            )))
+      '())
+  )
+
+; ========== beginDIalog ==========
+; funcion encargada de la finalizacion del chatbot retornando un log final con todas las modificiones anteriores
+;Signature: estructura X lista X entero -> lista de Strings
+(define (endDialog chatbot log seed)
+  (append log (list (string-append (number->string(date-day (current-date))) "-"
+                 (number->string(date-month (current-date))) "-"
+                 (number->string(date-year (current-date))) " "
+                 (number->string(date-hour (current-date))) ":"
+                 (number->string(date-minute (current-date))) ":"
+                 (number->string(date-second (current-date))) " -> "
+                 (datos "chatbot" (elemRandomDespedida seed))
+                 )) (chatbot-id bot)))
+
+
+; ========== sendMessage ==========
+; funcion encargada la revision del mensaje entregado por el usuario y generar una respuesta adecuada a la pregunta
+; Signature: estructura X lista X entero -> lista de Strings
+(define (sendMessage msg chatbot log seed)
+  (if (= (length log) 2)  ;comprobación utilizada para la obtención del nombre del usuario
+      (append log (list (string-append (number->string(date-day (current-date))) "-"
+                                           (number->string(date-month (current-date)))  "-"
+                                           (number->string(date-year (current-date)))   " "
+                                           (number->string(date-hour (current-date)))   ":"
+                                           (number->string(date-minute (current-date))) ":"
+                                           (number->string(date-second (current-date))) " -> "
+                                           (datos "usuario" msg)))
+              (list (string-append (number->string(date-day (current-date))) "-"
+                                   (number->string(date-month (current-date))) "-"
+                                   (number->string(date-year (current-date))) " "
+                                   (number->string(date-hour (current-date))) ":"
+                                   (number->string(date-minute (current-date))) ":"
+                                   (number->string(date-second (current-date))) " -> "
+                                   (datos "chatbot" (elemRandomPregunta seed msg))
+                                   )))
+      (if (empty? (intersectarListas (string-split msg) (chatbot-sintomas bot)))                 ;revisa si existe algun elemento entre el mensaje y la lista de sintomas
+          (append log (list (string-append (number->string(date-day (current-date))) "-"         ;se agrega al log el mensaje del usuario y la respuesta del chatbot
+                                           (number->string(date-month (current-date)))  "-"
+                                           (number->string(date-year (current-date)))   " "
+                                           (number->string(date-hour (current-date)))   ":"
+                                           (number->string(date-minute (current-date))) ":"
+                                           (number->string(date-second (current-date))) " -> "
+                                           (datos "usuario" msg)))
+                  (list (string-append (number->string(date-day (current-date))) "-"
+                                       (number->string(date-month (current-date)))  "-"
+                                       (number->string(date-year (current-date)))   " "
+                                       (number->string(date-hour (current-date)))   ":"
+                                       (number->string(date-minute (current-date))) ":"
+                                       (number->string(date-second (current-date))) " -> "
+                                       (datos "chatbot" "disculpa pero no entiendo a lo que te refieres, ¿me lo puedes repetir porfavor?"))) ;respuesta en caso de no encontrar respuesta  
+                  )
+          (append log (list (string-append (number->string(date-day (current-date))) "-"         ;se agrega al log el mensaje del usuario y la respuesta del chatbot
+                                           (number->string(date-month (current-date)))  "-"
+                                           (number->string(date-year (current-date)))   " "
+                                           (number->string(date-hour (current-date)))   ":"
+                                           (number->string(date-minute (current-date))) ":"
+                                           (number->string(date-second (current-date))) " -> "
+                                           (datos "usuario" msg)))
+                  (list (string-append (number->string(date-day (current-date))) "-"
+                                       (number->string(date-month (current-date)))  "-"
+                                       (number->string(date-year (current-date)))   " "
+                                       (number->string(date-hour (current-date)))   ":"
+                                       (number->string(date-minute (current-date))) ":"
+                                       (number->string(date-second (current-date))) " -> "
+                                       (datos "chatbot" (entregarDiagnostico (car(intersectarListas (string-split msg) (chatbot-sintomas bot))) (chatbot-sintomas bot) (chatbot-diagnosticos bot)))))
+                  (list (string-append (number->string(date-day (current-date))) "-"
+                                       (number->string(date-month (current-date)))  "-"
+                                       (number->string(date-year (current-date)))   " "
+                                       (number->string(date-hour (current-date)))   ":"
+                                       (number->string(date-minute (current-date))) ":"
+                                       (number->string(date-second (current-date))) " -> "
+                                       (datos "chatbot" (verificarConsulta msg) )))
+                  )
+          )
+  )
+)
+
+; ========== verificarConsulta ==========
+; funcion encargada de verificar si el usuario desea realizar alguna otra consulta antes de utilizar endDialog
+; Signature: String -> String
+(define (verificarConsulta mensaje)
+  (if (equal? mensaje "no")
+      ""
+      "tiene alguna otra consulta?"
+      )
+  )
+      
+
+; ========== entregarDiagnostico ==========
+; funcion que segun un sintoma entregado te retorna el diagnostico almacenado en la estructura del chatbot
+; Signature: string X lista de Strings X lista de Strings -> String
+; recursion: recursion de cola
+(define (entregarDiagnostico sintoma listaSintomas listaDiagnosticos)
+  (if (equal? (car listaSintomas) sintoma)
+      (car listaDiagnosticos)
+      (entregarDiagnostico sintoma (cdr listaSintomas) (cdr listaDiagnosticos))
+      )
+  )
+
+; ========== intersectarListas ==========
+; Funcion encargada de buscar elementos conjuntos en ambas listas
+; Signature: lista X lista -> lista
+; recursion: recursion de cola
+(define intersectarListas
+    (lambda (list1 list2)
+            (letrec
+              ((I (lambda (aux)
+                      (cond
+                           ((null? aux) (quote ()))
+                           ((member (car aux) list2)
+                            (cons (car aux) (I (cdr aux))))
+                           (else (I (cdr aux)))
+                           )
+                    )
+                  )
+               )
+            (I list1)
+              )
+      )
+)
+
+; ========== calculoRate ==========
+; Funcion encargada de realizar una autoevaluacion de la conversacion realizada
+; Signature: lista -> lista
+(define (calculoRate log)
+  (cond
+   [(<= (length log) 6) (list 1)]
+   [(and (> (length log) 6)  (<= (length log) 8)) (list 2)]
+   [(and (> (length log) 8)  (<= (length log) 10)) (list 3)]
+   [(and (> (length log) 10)  (<= (length log) 12)) (list 4)]
+   [(> (length log) 12) (list 5)])
+  )
+
+; ========== ultimoElem ==========
+; Funcion encargada de verificar si el la conversacion fue finalizada por el usuario para el uso del rate
+; Signature: lista -> lista
+; recursion: recursion de cola
+(define (ultimoElem log)
+  (if (empty? log)
+      '()
+      (if (and (equal? (car log) '(1)) (null? (cdr log)))
+          log
+          (ultimoElem (cdr log))
+          )
+      )
+  )
+
+; ========== rate ==========
+; Funcion que realiza una insercion de los puntajes agregados por el usuario y la autoevaluación a una nueva estructura
+; Signature: estructura X entero X funcion X lista -> estructura chatbot
+(define (rate chatbot score f log)
+  ;funcion ultimoElem pendiente
+        (nuevoChatbot score f log (car log))  )
+
+; ========== nuevoChatbot ==========
+; Funcion que crea una nueva estructura de tipo chatbot con distintos valores de id, y rate
+; Signature: entero X funcion X lista X lista -> estructura chatbot
+(define (nuevoChatbot score funcion log id)
+  (make-chatbot (chatbot-mensajeBienvenida bot)
+                 (chatbot-mensajePregunta bot)
+                 (chatbot-mensajeFinal bot)
+                 (chatbot-mensajeLazy bot)
+                 (chatbot-sintomas bot)
+                 (chatbot-diagnosticos bot)
+                 (list (+ id 1))
+                 (list score)
+                 funcion
+                 )
+)
+
+; ========== test ==========
+; Funcion que simula una conversacion entre usuarios con respuestas establecidas y el chatbot
+; Signature: lista de strings X estructura X lista X entero -> lista de strings
+; recursion: recursion de cola
+(define (test user chatbot log seed)
+  (define (test2 user chatbot log seed)
+    (if (null? user)
+        (endDialog bot log seed)
+        (test2 (cdr user) chatbot (sendMessage (car user) bot log seed) seed)
+        )
+    )
+  (test2 user chatbot (beginDialog bot '() seed) seed)
+  )
