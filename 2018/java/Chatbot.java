@@ -1,5 +1,7 @@
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Date;
+import java.util.Set;
 
 public class Chatbot {
 
@@ -31,21 +33,32 @@ public class Chatbot {
 
     public Mensajes createMessage(String msjUser) {
 
-        Mensajes newMessage = new Mensajes();
-        Date date           = new Date();
+        Mensajes newMessage  = new Mensajes();
+        Date date            = new Date();
 
-        String msj       = null;
-        String timeStamp = String.format("[ %tD %tR ]", date, date);
-        String[] arr     = msjUser.split(" ");
+        String str           = null;
+        String msj           = null;
+        String timeStamp     = String.format("[ %tD %tR ]", date, date);
+        String[] arr         = msjUser.split(" ");
+        Set<String> keys     = palabraRespuesta.keySet();
+        Iterator<String> itr = keys.iterator();
 
-        // realizar interseccion entre palabras
         for (String token : arr) {
-            System.out.println(token);
+
+            while (itr.hasNext()) {
+
+               str = itr.next();
+
+               if(str.equals(token)) {
+                   msj = palabraRespuesta.get(str);
+               }
+            }
         }
 
         newMessage.setUser("chatbot");
         newMessage.setDateTime(timeStamp);
         newMessage.setMessage(msj);
+
         return newMessage;
     }
 }

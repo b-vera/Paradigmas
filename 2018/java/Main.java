@@ -79,9 +79,10 @@ public class Main {
                     user.setName(name);
                 }
 
-            } else {
-                System.out.println("Entrada no valida, Pruebe denuevo");
             }
+            // else {
+            //     System.out.println("Entrada no valida, Pruebe denuevo");
+            // }
 
         }
     }
