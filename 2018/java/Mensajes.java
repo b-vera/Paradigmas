@@ -27,4 +27,9 @@ public class Mensajes {
     public String getUser() {
         return user;
     }
+
+    public String printMessage() {
+        String msj = dateTime + " " + user + ": " + message;
+        return msj;
+    }
 }

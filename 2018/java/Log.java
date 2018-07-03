@@ -16,24 +16,30 @@ public class Log {
     public void loadLog(String fileName) {
         ArrayList<String> message = new ArrayList<String>();
 
-        File archivo = null;
-        FileReader fr = null;
+        File archivo      = null;
+        FileReader fr     = null;
         BufferedReader br = null;
         String linea;
+
         try {
             fr = new FileReader (fileName);
             br = new BufferedReader(fr);
 
             String aux = "";
+
             while(aux != null){
                 aux = br.readLine();
+
                 if (aux == null) {
                     break;
                 }
+
                 message.add(aux);
             }
+
             System.out.println(message);
             System.out.println("> Se ha cargado el Log <");
+
             fr.close();
 
 
@@ -43,13 +49,18 @@ public class Log {
         }
     }
 
-    public void saveLog() {
+    public void saveLog(ArrayList<Mensajes> preLog) {
+
         logDataTime();
         File archivo = new File(logTimeStamp);
         BufferedWriter bw;
+
 		try{
 			bw = new BufferedWriter(new FileWriter(archivo));
-			bw.write("Palabras en la Sopa:\n");
+            for (int i = 0; i < preLog.size(); i++) {
+                bw.write(preLog.get(i).printMessage());
+                bw.write("\n");
+            }
             System.out.println("> Se ha guardado el Log <");
 			bw.close();
 		}

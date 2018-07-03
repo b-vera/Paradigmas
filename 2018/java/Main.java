@@ -13,7 +13,7 @@ public class Main {
         ArrayList<Mensajes> preLog = new ArrayList<Mensajes>();
 
         //  indica inicio o fin del dialogo
-        int flag = 0;
+        int flag     = 0;
         int shutDown = 0;
 
         // carga de respuestas a bot
@@ -24,13 +24,13 @@ public class Main {
 
         while (shutDown == 0) {
             String input, seed, fileName;
-            int rateBot, rateUser;
-            char firstChar;
+            int    rateBot, rateUser;
+            char   firstChar;
 
-            System.out.print(" -> ");
+            System.out.print("-> ");
 
-            input     = sc.next();
-            firstChar = input.charAt(0);
+            input        = sc.nextLine();
+            String[] arr = input.split(" ");
 
             // salida del programa
             if (input.equals(".")) {
@@ -38,52 +38,49 @@ public class Main {
                 break;
             }
 
-            else if (firstChar == '!') {
+            switch(arr[0]) {
 
-                switch(input) {
+                case "!beginDialog" :
+                    // seed = sc.nextLine();
+                    preLog.clear();
+                    flag = 1;
+                    break;
 
-                    case "!beginDialog" :
-                        seed = sc.nextLine();
-                        preLog.clear();
-                        flag = 1;
-                        break;
+                case "!endDialog" :
+                    flag = 0;
+                    Mensajes msjChatbot = bot.createMessage(user.getName(),input);
+                    preLog.add(msjChatbot);
+                    break;
 
-                    case "!endDialog" :
-                        flag = 0;
-                        System.out.println(bot.getDespedida());
-                        break;
+                case "!saveLog" :
+                    log.saveLog(preLog);
+                    break;
 
-                    case "!saveLog" :
-                        log.saveLog();
-                        break;
+                case "!loadLog" :
+                    // fileName = sc.nextLine();
+                    // log.loadLog(fileName);
+                    break;
 
-                    case "!loadLog" :
-                        fileName = sc.nextLine();
-                        log.loadLog(fileName);
-                        break;
-
-                    case "!rate" :
-                        rateBot  = sc.nextInt();
-                        rateUser = sc.nextInt();
-                        sc.nextLine();
-                        break;
-                }
+                case "!rate" :
+                    // rateBot  = sc.nextInt();
+                    // rateUser = sc.nextInt();
+                    // sc.nextLine();
+                    break;
             }
 
             if (flag == 1) {
 
                 // entrada nombre del usuario
-                if (user.getName() == null) {
-                    System.out.print("¿Me podria decir su nombre?: ");
-                    String name = sc.nextLine();
-                    user.setName(name);
-                }
+                Mensajes msjUser    = user.createMessage(input);
+                Mensajes msjChatbot = bot.createMessage(user.getName(),input);
+                preLog.add(msjUser);
+                preLog.add(msjChatbot);
 
             }
-            // else {
-            //     System.out.println("Entrada no valida, Pruebe denuevo");
-            // }
-
         }
+
+        // for (int i = 0; i < preLog.size(); i++) {
+        //     preLog.get(i).printMessage();
+        // }
     }
 }

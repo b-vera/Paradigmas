@@ -10,6 +10,7 @@ public class Chatbot {
     private String despedida  = null;
     private int rateUser;
     private int rateChatbot;
+    private int flagName = 0;
 
     public void answers() {
 
@@ -31,7 +32,7 @@ public class Chatbot {
         return despedida;
     }
 
-    public Mensajes createMessage(String msjUser) {
+    public Mensajes createMessage(String nameUser,String msjUser) {
 
         Mensajes newMessage  = new Mensajes();
         Date date            = new Date();
@@ -43,18 +44,37 @@ public class Chatbot {
         Set<String> keys     = palabraRespuesta.keySet();
         Iterator<String> itr = keys.iterator();
 
-        for (String token : arr) {
+        if(flagName == 1) {
+            msj = "¿en que puedo ayudarte " + nameUser + "?";
+            flagName--;
+        }
+
+        if(arr[0].equals("!beginDialog")) {
+            msj = "¿Me podrias decir tu nombre?";
+            flagName++;
+        }
+
+        if(arr[0].equals("!endDialog")) {
+            msj = getDespedida();
+        }
+
+        for (Integer i = 0; i < arr.length; i++) {
 
             while (itr.hasNext()) {
-
                str = itr.next();
 
-               if(str.equals(token)) {
+               if(str.equals(arr[i])) {
                    msj = palabraRespuesta.get(str);
                }
             }
+            itr = keys.iterator();
         }
 
+        if(msj == null) {
+            msj = "no he entendido tu pregunta, ¿podrias Repetirmela?";
+        }
+
+        System.out.println("-> chatbot: " + msj);
         newMessage.setUser("chatbot");
         newMessage.setDateTime(timeStamp);
         newMessage.setMessage(msj);
